@@ -1,6 +1,6 @@
 {
   "name": "@tsuk1ko/cq-websocket",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "A Node SDK for developing QQ chatbots based on WebSocket, which is depending on CoolQ and CQHTTP API plugin.",
   "main": "./src/index.js",
   "browser": "./dist/cq-websocket.min.js",
@@ -24,18 +24,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/momocow/node-cq-websocket.git"
+    "url": "git+https://github.com/Tsuk1ko/node-cq-websocket.git"
   },
   "keywords": [
     "CoolQ",
     "websocket"
   ],
-  "author": "MomoCow",
+  "author": "神代綺凛 <i@loli.best>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/momocow/node-cq-websocket/issues"
+    "url": "https://github.com/Tsuk1ko/node-cq-websocket/issues"
   },
-  "homepage": "https://github.com/momocow/node-cq-websocket#readme",
+  "homepage": "https://github.com/Tsuk1ko/node-cq-websocket#readme",
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
