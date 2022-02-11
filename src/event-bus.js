@@ -27,6 +27,13 @@ class CQEventBus {
             me: [],
           },
         },
+        guild: {
+          '': [],
+          '@': {
+            '': [],
+            me: [],
+          },
+        },
       },
       event: [],
       notice: {

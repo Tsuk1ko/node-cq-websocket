@@ -1,14 +1,14 @@
 # 事件列表
 
-- [事件列表](#%E4%BA%8B%E4%BB%B6%E5%88%97%E8%A1%A8)
-    - [事件樹](#%E4%BA%8B%E4%BB%B6%E6%A8%B9)
-    - [基本事件](#%E5%9F%BA%E6%9C%AC%E4%BA%8B%E4%BB%B6)
-        - [message](#message)
-        - [notice](#notice)
-        - [request](#request)
-        - [meta_event](#metaevent)
-        - [socket](#socket)
-        - [api](#api)
+- [事件列表](#事件列表)
+  - [事件樹](#事件樹)
+  - [基本事件](#基本事件)
+    - [message](#message)
+    - [notice](#notice)
+    - [request](#request)
+    - [meta_event](#meta_event)
+    - [socket](#socket)
+    - [api](#api)
 
 ## 事件樹
 ```
@@ -87,6 +87,9 @@
 | message.group | `event` CQEvent <br> `context` object<br> `tags` CQTag[] | 群消息。 |
 | message.group.@ | `event` CQEvent <br> `context` object <br> `tags` CQTag[] | 有人於群消息中被at。 |
 | message.group.@.me | `event` CQEvent <br> `context` object<br> `tags` CQTag[] | 有人於群消息at機器人。 |
+| message.guild | `event` CQEvent <br> `context` object<br> `tags` CQTag[] | 频道消息。 |
+| message.guild.@ | `event` CQEvent <br> `context` object <br> `tags` CQTag[] | 有人於频道消息中被at。 |
+| message.guild.@.me | `event` CQEvent <br> `context` object<br> `tags` CQTag[] | 有人於频道消息at機器人。 |
 
 ### notice
 | 事件類型 | 監聽器參數 | 說明 |

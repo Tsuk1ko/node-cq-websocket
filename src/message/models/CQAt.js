@@ -10,7 +10,7 @@ module.exports = class CQAt extends CQTag {
   }
 
   coerce() {
-    this.data.qq = Number(this.data.qq);
+    this.data.qq = String(this.data.qq);
     return this;
   }
 };

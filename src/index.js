@@ -41,7 +41,7 @@ class CQWebSocket extends $Callable {
     // application aware configs
     enableAPI = true,
     enableEvent = true,
-    qq = -1,
+    qq = -1, // deprecated
 
     // reconnection configs
     reconnection = true,
@@ -72,7 +72,7 @@ class CQWebSocket extends $Callable {
     /// *****************/
 
     this._token = String(accessToken);
-    this._qq = parseInt(qq);
+    this._qq = parseInt(qq); // deprecated
     this._baseUrl = baseUrl || `${protocol}//${host}:${port}`;
 
     this._reconnectOptions = {
@@ -208,36 +208,16 @@ class CQWebSocket extends $Callable {
             this._eventBus.emit('message.private', msgObj, tags);
             break;
           case 'discuss':
-            {
-              // someone is @-ed
-              const attags = tags.filter(t => t.tagName === 'at');
-              if (attags.length > 0) {
-                if (attags.filter(t => t.qq === this._qq).length > 0) {
-                  this._eventBus.emit('message.discuss.@.me', msgObj, tags);
-                } else {
-                  this._eventBus.emit('message.discuss.@', msgObj, tags);
-                }
-              } else {
-                this._eventBus.emit('message.discuss', msgObj, tags);
-              }
-            }
+            this._handleGroupMsg('discuss', msgObj, tags);
             break;
           case 'group':
-            {
-              const attags = tags.filter(t => t.tagName === 'at');
-              if (attags.length > 0) {
-                if (attags.filter(t => t.qq === this._qq).length > 0) {
-                  this._eventBus.emit('message.group.@.me', msgObj, tags);
-                } else {
-                  this._eventBus.emit('message.group.@', msgObj, tags);
-                }
-              } else {
-                this._eventBus.emit('message.group', msgObj, tags);
-              }
-            }
+            this._handleGroupMsg('group', msgObj, tags);
+            break;
+          case 'guild':
+            this._handleGroupMsg('guild', msgObj, tags);
             break;
           default:
-            this._eventBus.emit('error', new UnexpectedContextError(msgObj, 'unexpected "message_type"'));
+            this._eventBus.emit('message', msgObj, tags);
         }
         break;
       case 'notice': // Added, reason: CQHttp 4.X
@@ -254,7 +234,7 @@ class CQWebSocket extends $Callable {
                 this._eventBus.emit('notice.group_admin.unset', msgObj);
                 break;
               default:
-                this._eventBus.emit('error', new UnexpectedContextError(msgObj, 'unexpected "sub_type"'));
+                this._eventBus.emit('notice.group_admin', msgObj);
             }
             break;
           case 'group_decrease':
@@ -269,7 +249,7 @@ class CQWebSocket extends $Callable {
                 this._eventBus.emit('notice.group_decrease.kick_me', msgObj);
                 break;
               default:
-                this._eventBus.emit('error', new UnexpectedContextError(msgObj, 'unexpected "sub_type"'));
+                this._eventBus.emit('notice.group_decrease', msgObj);
             }
             break;
           case 'group_increase':
@@ -281,7 +261,7 @@ class CQWebSocket extends $Callable {
                 this._eventBus.emit('notice.group_increase.invite', msgObj);
                 break;
               default:
-                this._eventBus.emit('error', new UnexpectedContextError(msgObj, 'unexpected "sub_type"'));
+                this._eventBus.emit('notice.group_increase', msgObj);
             }
             break;
           case 'friend_add':
@@ -296,11 +276,11 @@ class CQWebSocket extends $Callable {
                 this._eventBus.emit('notice.group_ban.lift_ban', msgObj);
                 break;
               default:
-                this._eventBus.emit('error', new UnexpectedContextError(msgObj, 'unexpected "sub_type"'));
+                this._eventBus.emit('notice.group_ban', msgObj);
             }
             break;
           default:
-            this._eventBus.emit('error', new UnexpectedContextError(msgObj, 'unexpected "notice_type"'));
+            this._eventBus.emit('notice', msgObj);
         }
         break;
       case 'request':
@@ -317,11 +297,11 @@ class CQWebSocket extends $Callable {
                 this._eventBus.emit('request.group.invite', msgObj);
                 break;
               default:
-                this._eventBus.emit('error', new UnexpectedContextError(msgObj, 'unexpected "sub_type"'));
+                this._eventBus.emit('request.group', msgObj);
             }
             break;
           default:
-            this._eventBus.emit('error', new UnexpectedContextError(msgObj, 'unexpected "request_type"'));
+            this._eventBus.emit('request', msgObj);
         }
         break;
       case 'meta_event':
@@ -333,11 +313,28 @@ class CQWebSocket extends $Callable {
             this._eventBus.emit('meta_event.heartbeat', msgObj);
             break;
           default:
-            this._eventBus.emit('error', new UnexpectedContextError(msgObj, 'unexpected "meta_event_type"'));
+            this._eventBus.emit('meta_event', msgObj);
         }
         break;
       default:
         this._eventBus.emit('error', new UnexpectedContextError(msgObj, 'unexpected "post_type"'));
+    }
+  }
+
+  _handleGroupMsg(type, msgObj, tags) {
+    const attags = tags.filter(t => t.tagName === 'at');
+    if (attags.length > 0) {
+      const atMe =
+        type === 'guild'
+          ? attags.find(t => t.qq === msgObj.self_tiny_id)
+          : attags.find(t => t.qq === String(msgObj.self_id));
+      if (atMe) {
+        this._eventBus.emit(`message.${type}.@.me`, msgObj, tags);
+      } else {
+        this._eventBus.emit(`message.${type}.@`, msgObj, tags);
+      }
+    } else {
+      this._eventBus.emit(`message.${type}`, msgObj, tags);
     }
   }
 
@@ -391,18 +388,6 @@ class CQWebSocket extends $Callable {
 
             if (this.isReady()) {
               this._eventBus.emit('ready', this);
-
-              // if /api is not disabled, it is ready now.
-              // if qq < 0, it is not configured manually by user
-              if (this._monitor.API.state !== WebSocketState.DISABLED && this._qq < 0) {
-                this('get_login_info')
-                  .then(ctxt => {
-                    this._qq = parseInt($get(ctxt, 'data.user_id', -1));
-                  })
-                  .catch(err => {
-                    this._eventBus.emit('error', err);
-                  });
-              }
             }
           },
           {
