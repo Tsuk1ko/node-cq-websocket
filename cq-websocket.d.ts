@@ -215,8 +215,8 @@ export declare class CQTag {
 }
 
 export class CQAt extends CQTag {
-  readonly qq: number;
-  constructor(qq: number);
+  readonly qq: string;
+  constructor(qq: number | string);
 }
 
 export class CQAnonymous extends CQTag {
