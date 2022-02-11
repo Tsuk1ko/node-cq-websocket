@@ -1,30 +1,30 @@
-const { CQWebSocket, WebSocketState } = require('../..')
+const { CQWebSocket, WebSocketState } = require('../..');
 
-const test = require('ava').default
+const test = require('ava').default;
 
 test('new CQWebSocket() with default options', function (t) {
-  t.plan(8)
+  t.plan(8);
 
-  const bot = new CQWebSocket()
+  const bot = new CQWebSocket();
 
-  t.is(bot._monitor.EVENT.state, WebSocketState.INIT)
-  t.is(bot._monitor.API.state, WebSocketState.INIT)
-  t.is(bot._baseUrl, 'ws://127.0.0.1:6700')
-  t.is(bot._qq, -1)
-  t.is(bot._token, '')
+  t.is(bot._monitor.EVENT.state, WebSocketState.INIT);
+  t.is(bot._monitor.API.state, WebSocketState.INIT);
+  t.is(bot._baseUrl, 'ws://127.0.0.1:6700');
+  t.is(bot._qq, -1);
+  t.is(bot._token, '');
   t.deepEqual(bot._reconnectOptions, {
     reconnection: true,
     reconnectionAttempts: Infinity,
-    reconnectionDelay: 1000
-  })
+    reconnectionDelay: 1000,
+  });
   t.deepEqual(bot._wsOptions, {
-    fragmentOutgoingMessages: false
-  })
-  t.deepEqual(bot._requestOptions, { })
-})
+    fragmentOutgoingMessages: false,
+  });
+  t.deepEqual(bot._requestOptions, {});
+});
 
 test('new CQWebSocket() with custom options', function (t) {
-  t.plan(8)
+  t.plan(8);
 
   const bot = new CQWebSocket({
     enableAPI: false,
@@ -38,58 +38,58 @@ test('new CQWebSocket() with custom options', function (t) {
     fragmentOutgoingMessages: true,
     fragmentationThreshold: 0x4000,
     requestOptions: {
-      timeout: 2000
-    }
-  })
+      timeout: 2000,
+    },
+  });
 
-  t.is(bot._monitor.EVENT.state, WebSocketState.INIT)
-  t.is(bot._monitor.API.state, WebSocketState.DISABLED)
-  t.is(bot._baseUrl, 'ws://8.8.8.8:8888/ws')
-  t.is(bot._qq, 123456789)
-  t.is(bot._token, 'qwerasdf')
+  t.is(bot._monitor.EVENT.state, WebSocketState.INIT);
+  t.is(bot._monitor.API.state, WebSocketState.DISABLED);
+  t.is(bot._baseUrl, 'ws://8.8.8.8:8888/ws');
+  t.is(bot._qq, 123456789);
+  t.is(bot._token, 'qwerasdf');
   t.deepEqual(bot._requestOptions, {
-    timeout: 2000
-  })
+    timeout: 2000,
+  });
   t.deepEqual(bot._reconnectOptions, {
     reconnection: true,
     reconnectionAttempts: 10,
-    reconnectionDelay: 5000
-  })
+    reconnectionDelay: 5000,
+  });
   t.deepEqual(bot._wsOptions, {
     fragmentOutgoingMessages: true,
-    fragmentationThreshold: 0x4000
-  })
-})
+    fragmentationThreshold: 0x4000,
+  });
+});
 
 test('new Websocket(): protocol', function (t) {
-  t.plan(2)
+  t.plan(2);
 
   const bot1 = new CQWebSocket({
-    protocol: 'HTTP'
-  })
+    protocol: 'HTTP',
+  });
 
-  t.is(bot1._baseUrl, 'http://127.0.0.1:6700')
+  t.is(bot1._baseUrl, 'http://127.0.0.1:6700');
 
   const bot2 = new CQWebSocket({
     protocol: 'wss:',
-    port: 23456
-  })
+    port: 23456,
+  });
 
-  t.is(bot2._baseUrl, 'wss://127.0.0.1:23456')
-})
+  t.is(bot2._baseUrl, 'wss://127.0.0.1:23456');
+});
 
 test('new Websocket(): base url', function (t) {
-  t.plan(2)
-  
-  const bot1 = new CQWebSocket({
-    baseUrl: '127.0.0.1:22222'
-  })
+  t.plan(2);
 
-  t.is(bot1._baseUrl, 'ws://127.0.0.1:22222')
+  const bot1 = new CQWebSocket({
+    baseUrl: '127.0.0.1:22222',
+  });
+
+  t.is(bot1._baseUrl, 'ws://127.0.0.1:22222');
 
   const bot2 = new CQWebSocket({
-    baseUrl: 'wss://my.dns/bot'
-  })
+    baseUrl: 'wss://my.dns/bot',
+  });
 
-  t.is(bot2._baseUrl, 'wss://my.dns/bot')
-})
+  t.is(bot2._baseUrl, 'wss://my.dns/bot');
+});

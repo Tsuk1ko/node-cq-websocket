@@ -1,20 +1,20 @@
-const CQTag = require('../CQTag')
+const CQTag = require('../CQTag');
 
 module.exports = class CQText extends CQTag {
-  constructor (text) {
-    super('text', { text })
+  constructor(text) {
+    super('text', { text });
   }
 
-  get text () {
-    return this.data.text
+  get text() {
+    return this.data.text;
   }
 
-  coerce () {
-    this.data.text = String(this.data.text)
-    return this
+  coerce() {
+    this.data.text = String(this.data.text);
+    return this;
   }
 
-  toString () {
-    return this.data.text
+  toString() {
+    return this.data.text;
   }
-}
+};

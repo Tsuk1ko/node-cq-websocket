@@ -1,8 +1,9 @@
 # 範例
-基本創建一個複讀機器人的代碼範例如下(可參見[demo/echo-bot.js](https://github.com/momocow/node-cq-websocket/blob/master/demo/echo-bot.js))：
+
+基本創建一個複讀機器人的代碼範例如下(可參見[demo/echo-bot.js](https://github.com/Tsuk1ko/node-cq-websocket/blob/master/demo/echo-bot.js))：
 
 ```js
-const CQWebSocket = require('cq-websocket')
+const CQWebSocket = require('@tsuk1ko/cq-websocket')
 
 // 採用默認參數創建機器人實例
 let bot = new CQWebSocket()

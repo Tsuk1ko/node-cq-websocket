@@ -12,9 +12,9 @@ const CQTAG_TYPES = [
   'anonymous',
   'music',
   'share',
-  'text'
-]
+  'text',
+];
 
-module.exports = function isSupportedTag (tagName) {
-  return CQTAG_TYPES.includes(tagName)
-}
+module.exports = function isSupportedTag(tagName) {
+  return CQTAG_TYPES.includes(tagName);
+};

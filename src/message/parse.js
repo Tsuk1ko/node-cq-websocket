@@ -1,5 +1,5 @@
-const isSupportedTag = require('./isSupportedTag')
-const CQTag = require('./CQTag')
+const isSupportedTag = require('./isSupportedTag');
+const CQTag = require('./CQTag');
 const {
   CQAt,
   CQAnonymous,
@@ -15,112 +15,112 @@ const {
   CQSFace,
   CQShake,
   CQShare,
-  CQText
-} = require('./models')
+  CQText,
+} = require('./models');
 
-const CQTAGS_EXTRACTOR = /\[CQ[^\]]*\]/g
-const CQTAG_ANALYSOR = /\[CQ:([a-z]+?)(?:,((,?[a-zA-Z0-9-_.]+=[^,[\]]*)*))?\]/
+const CQTAGS_EXTRACTOR = /\[CQ[^\]]*\]/g;
+const CQTAG_ANALYSOR = /\[CQ:([a-z]+?)(?:,((,?[a-zA-Z0-9-_.]+=[^,[\]]*)*))?\]/;
 
-function parseData (dataStr = '') {
+function parseData(dataStr = '') {
   return dataStr
-    ? dataStr.split(',')
-      .map(opt => opt.split('='))
-      .reduce((data, [ k, v ]) => {
-        data[k] = v
-        return data
-      }, {})
-    : null
+    ? dataStr
+        .split(',')
+        .map(opt => opt.split('='))
+        .reduce((data, [k, v]) => {
+          data[k] = v;
+          return data;
+        }, {})
+    : null;
 }
 
-function castCQTag (cqtag) {
-  let proto
+function castCQTag(cqtag) {
+  let proto;
   switch (cqtag._type) {
     case 'anonymous':
-      proto = CQAnonymous.prototype
-      break
+      proto = CQAnonymous.prototype;
+      break;
     case 'at':
-      proto = CQAt.prototype
-      break
+      proto = CQAt.prototype;
+      break;
     case 'bface':
-      proto = CQBFace.prototype
-      break
+      proto = CQBFace.prototype;
+      break;
     case 'music':
-      proto = cqtag.data.type === 'custom'
-        ? CQCustomMusic.prototype : CQMusic.prototype
-      break
+      proto = cqtag.data.type === 'custom' ? CQCustomMusic.prototype : CQMusic.prototype;
+      break;
     case 'dice':
-      proto = CQDice.prototype
-      break
+      proto = CQDice.prototype;
+      break;
     case 'emoji':
-      proto = CQEmoji.prototype
-      break
+      proto = CQEmoji.prototype;
+      break;
     case 'face':
-      proto = CQFace.prototype
-      break
+      proto = CQFace.prototype;
+      break;
     case 'image':
-      proto = CQImage.prototype
-      break
+      proto = CQImage.prototype;
+      break;
     case 'record':
-      proto = CQRecord.prototype
-      break
+      proto = CQRecord.prototype;
+      break;
     case 'rps':
-      proto = CQRPS.prototype
-      break
+      proto = CQRPS.prototype;
+      break;
     case 'sface':
-      proto = CQSFace.prototype
-      break
+      proto = CQSFace.prototype;
+      break;
     case 'shake':
-      proto = CQShake.prototype
-      break
+      proto = CQShake.prototype;
+      break;
     case 'share':
-      proto = CQShare.prototype
-      break
+      proto = CQShare.prototype;
+      break;
     case 'text':
-      proto = CQText.prototype
+      proto = CQText.prototype;
   }
 
-  return Object.setPrototypeOf(cqtag, proto).coerce()
+  return Object.setPrototypeOf(cqtag, proto).coerce();
 }
 
 /**
  * @param {string|any[]} message
  */
-module.exports = function parse (message) {
+module.exports = function parse(message) {
   if (typeof message === 'string') {
-    let textTagScanner = 0
+    let textTagScanner = 0;
     const nonTextTags = (message.match(CQTAGS_EXTRACTOR) || [])
       .map(_tag => _tag.match(CQTAG_ANALYSOR))
       .filter(_tag => _tag && isSupportedTag(_tag[1]))
       .map(_tag => new CQTag(_tag[1], parseData(_tag[2])))
-      .map(castCQTag)
+      .map(castCQTag);
 
     // insert text tags into appropriate position
     const ret = nonTextTags.reduce((tags, cqtag, index) => {
-      const cqtagStr = cqtag.toString()
-      const cqtagIndex = message.indexOf(cqtagStr)
+      const cqtagStr = cqtag.toString();
+      const cqtagIndex = message.indexOf(cqtagStr);
       if (cqtagIndex !== textTagScanner) {
-        const text = message.substring(textTagScanner, cqtagIndex)
-        tags.push(new CQText(text))
+        const text = message.substring(textTagScanner, cqtagIndex);
+        tags.push(new CQText(text));
       }
-      tags.push(cqtag)
-      textTagScanner = cqtagIndex + cqtagStr.length
-      return tags
-    }, [])
+      tags.push(cqtag);
+      textTagScanner = cqtagIndex + cqtagStr.length;
+      return tags;
+    }, []);
 
     if (textTagScanner < message.length) {
       // there is still text
-      const text = message.substring(textTagScanner)
-      ret.push(new CQText(text))
+      const text = message.substring(textTagScanner);
+      ret.push(new CQText(text));
     }
-    return ret
+    return ret;
   }
 
   if (Array.isArray(message)) {
     return message
       .filter(_tag => isSupportedTag(_tag.type))
       .map(_tag => new CQTag(_tag.type, _tag.data))
-      .map(castCQTag)
+      .map(castCQTag);
   }
 
-  return []
-}
+  return [];
+};

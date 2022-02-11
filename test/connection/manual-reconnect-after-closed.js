@@ -1,34 +1,41 @@
-const { stub } = require('sinon')
-const setup = require('../fixture/setup')
+const { stub } = require('sinon');
+const setup = require('../fixture/setup');
 
-const { bot, planCount, assertSpies, done } = setup()
+const { bot, planCount, assertSpies, done } = setup();
 
-const manualReconnectAfterClosed = stub()
+const manualReconnectAfterClosed = stub();
 manualReconnectAfterClosed.onCall(0).callsFake(function () {
-  bot.disconnect()
-})
+  bot.disconnect();
+});
 manualReconnectAfterClosed.onCall(1).callsFake(function () {
-  bot.reconnect()
-})
+  bot.reconnect();
+});
 
 module.exports = function (t) {
-  t.plan(planCount())
+  t.plan(planCount());
 
   bot
     .on('ready', function () {
       if (manualReconnectAfterClosed.callCount === 0) {
-        manualReconnectAfterClosed()
+        manualReconnectAfterClosed();
       } else {
         // Assertion
-        assertSpies(t, { connectingCount: 4, connectCount: 4, closingCount: 2, closeCount: 2, reconnectingCount: 2, reconnectCount: 2 })
-        t.end()
-        done()
+        assertSpies(t, {
+          connectingCount: 4,
+          connectCount: 4,
+          closingCount: 2,
+          closeCount: 2,
+          reconnectingCount: 2,
+          reconnectCount: 2,
+        });
+        t.end();
+        done();
       }
     })
     .on('socket.close', function () {
       if (manualReconnectAfterClosed.callCount === 1) {
-        manualReconnectAfterClosed()
+        manualReconnectAfterClosed();
       }
     })
-    .connect()
-}
+    .connect();
+};

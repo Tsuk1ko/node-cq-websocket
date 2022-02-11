@@ -1,5 +1,4 @@
-const path = require('path')
-const KaomojifyWebpackPlugin = require('kaomojify-webpack-plugin')
+const path = require('path');
 
 const COMMON_CONFIG = {
   mode: 'production',
@@ -8,30 +7,21 @@ const COMMON_CONFIG = {
     library: {
       root: 'CQWebSocketSDK',
       amd: 'cq-websocket',
-      commonjs: 'cq-websocket'
+      commonjs: 'cq-websocket',
     },
     libraryTarget: 'umd',
     libraryExport: '',
-    path: path.join(__dirname, 'dist')
-  }
-}
+    path: path.join(__dirname, 'dist'),
+  },
+};
 
 module.exports = [
-  { // minified bundle
+  {
+    // minified bundle
     ...COMMON_CONFIG,
     output: {
       ...COMMON_CONFIG.output,
-      filename: 'cq-websocket.min.js'
-    }
-  },
-  { // kaomojified bundle (x100 in size) (*´∇｀*)/
-    ...COMMON_CONFIG,
-    output: {
-      ...COMMON_CONFIG.output,
-      filename: 'cq-websocket.kaomojified.js'
+      filename: 'cq-websocket.min.js',
     },
-    plugins: [
-      new KaomojifyWebpackPlugin()
-    ]
-  }
-]
+  },
+];

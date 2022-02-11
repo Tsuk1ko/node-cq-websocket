@@ -8,13 +8,14 @@
   - [WebSocket 關閉之狀態碼](#websocket-%E9%97%9C%E9%96%89%E4%B9%8B%E7%8B%80%E6%85%8B%E7%A2%BC)
 
 ## 建立連線
+
 為了與事先配置完成的 CQHTTP API 插件建立連線，端口、服務器位址都在創建實例時便已經配置好了，這邊只需要呼叫 connect 方法即可。
 
 ```js
 bot.connect()
 ```
 
-由於連線的建立是屬於異步操作，呼叫 connect 後立刻發送消息並沒有任何卵用 ┐(´д`)┌ 。
+由於連線的建立是屬於異步操作，呼叫 connect 後立刻發送消息並沒有任何卵用 ┐(´д`)┌ 。  
 我們需要靜待 `ready` 事件的發生，示意機器人就緒，可以開始進行消息操作。
 
 ```js
@@ -26,11 +27,14 @@ bot.on('ready', function () {
 值得注意的是，如果此時發生暫時性的網路問題，造成連線中斷，SDK 會自動嘗試重新建立連線，一旦連線再次建立完畢，會再次觸發 `ready` 事件，因此如果有些代碼在整個程序運行過程中，只能執行一次，這邊可以使用 `bot.once('ready')` 而非範例中的 `bot.on('ready')`。
 
 ### 延伸閱讀
+
 - [API: CQWebSocket #on()](../api/CQWebSocket.md#on)
 - [API: CQWebSocket #once()](../api/CQWebSocket.md#once)
 
 ## 斷線重連
+
 我們可以注意到 CQWebSocket Constructor 裡面有幾項關於重新連接的配置。
+
 - `reconnection`
 - `reconnectionAttempts`
 - `reconnectionDelay`
@@ -47,8 +51,9 @@ bot.on('ready', function () {
 SDK 底層封裝了兩個 socket 均會各自發布 `socket` 事件。
 
 ### 範例
+
 ```js
-const CQWebSocket = require('cq-websocket')
+const CQWebSocket = require('@tsuk1ko/cq-websocket')
 const { WebsocketType } = CQWebSocket
 const bot = new CQWebSocket()
 
@@ -69,6 +74,7 @@ bot.on('socket.connecting', function (socketType, attempts) {
 ```
 
 ## WebSocket 關閉之狀態碼
+
 若呼叫 `CQWebSocket #disconnect()` 會對服務器端發送夾帶 `1000` 狀態碼的關閉訊息, 表示正常關閉, 無需重連。
 
 若發生網路斷線、服務器重啟... 等意外斷線, 通常會獲得 `1006` 狀態碼, 此狀態表示 websocket 客戶端 (即機器人端) 觀察到服務器關閉。

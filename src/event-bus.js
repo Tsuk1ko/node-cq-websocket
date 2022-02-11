@@ -1,12 +1,12 @@
-const $get = require('lodash.get')
+const $get = require('lodash.get');
 
-const $traverse = require('./util/traverse')
+const $traverse = require('./util/traverse');
 
-const CQTag = require('./message/CQTag')
-const CQText = require('./message/models/CQText')
+const CQTag = require('./message/CQTag');
+const CQText = require('./message/models/CQText');
 
 class CQEventBus {
-  constructor (cqbot) {
+  constructor(cqbot) {
     // eventType-to-handlers mapping
     // blank keys refer to default keys
     this._EventMap = {
@@ -17,16 +17,16 @@ class CQEventBus {
           '': [],
           '@': {
             '': [],
-            'me': []
-          }
+            me: [],
+          },
         },
         discuss: {
           '': [],
           '@': {
             '': [],
-            'me': []
-          }
-        }
+            me: [],
+          },
+        },
       },
       event: [],
       notice: {
@@ -35,25 +35,25 @@ class CQEventBus {
         group_admin: {
           '': [],
           set: [],
-          unset: []
+          unset: [],
         },
         group_decrease: {
           '': [],
           leave: [],
           kick: [],
-          kick_me: []
+          kick_me: [],
         },
         group_increase: {
           '': [],
           approve: [],
-          invite: []
+          invite: [],
         },
         friend_add: [],
         group_ban: {
           '': [],
           ban: [],
-          lift_ban: []
-        }
+          lift_ban: [],
+        },
       },
       request: {
         '': [],
@@ -61,8 +61,8 @@ class CQEventBus {
         group: {
           '': [],
           add: [],
-          invite: []
-        }
+          invite: [],
+        },
       },
       ready: [],
       error: [],
@@ -76,21 +76,21 @@ class CQEventBus {
         max_reconnect: [],
         error: [],
         closing: [],
-        close: []
+        close: [],
       },
       api: {
         response: [],
         send: {
           pre: [],
-          post: []
-        }
+          post: [],
+        },
       },
       meta_event: {
         '': [],
         lifecycle: [],
-        heartbeat: []
-      }
-    }
+        heartbeat: [],
+      },
+    };
 
     /**
      * A function-to-function mapping
@@ -100,177 +100,172 @@ class CQEventBus {
      *     and is the listener that is actually registered via #on(event, listener)
      * @type {WeakMap<Function, Function>}
      */
-    this._onceListeners = new WeakMap()
+    this._onceListeners = new WeakMap();
 
-    this._isSocketErrorHandled = false
-    this._bot = cqbot
+    this._isSocketErrorHandled = false;
+    this._bot = cqbot;
 
     // has a default handler; automatically removed when developers register their own ones
-    this._installDefaultErrorHandler()
+    this._installDefaultErrorHandler();
   }
 
-  _getHandlerQueue (eventType) {
-    let queue = $get(this._EventMap, eventType)
+  _getHandlerQueue(eventType) {
+    let queue = $get(this._EventMap, eventType);
     if (Array.isArray(queue)) {
-      return queue
+      return queue;
     }
-    queue = $get(this._EventMap, `${eventType}.`)
-    return Array.isArray(queue) ? queue : undefined
+    queue = $get(this._EventMap, `${eventType}.`);
+    return Array.isArray(queue) ? queue : undefined;
   }
 
-  count (eventType) {
-    let queue = this._getHandlerQueue(eventType)
-    return queue ? queue.length : undefined
+  count(eventType) {
+    const queue = this._getHandlerQueue(eventType);
+    return queue ? queue.length : undefined;
   }
 
-  has (eventType) {
-    return this._getHandlerQueue(eventType) !== undefined
+  has(eventType) {
+    return this._getHandlerQueue(eventType) !== undefined;
   }
 
-  emit (eventType, ...args) {
-    return this._emitThroughHierarchy(eventType, ...args)
+  emit(eventType, ...args) {
+    return this._emitThroughHierarchy(eventType, ...args);
   }
 
-  async _emitThroughHierarchy (eventType, ...args) {
-    let queue = []
-    let isResponsable = eventType.startsWith('message')
+  async _emitThroughHierarchy(eventType, ...args) {
+    const queue = [];
+    const isResponsable = eventType.startsWith('message');
 
     for (let hierarchy = eventType.split('.'); hierarchy.length > 0; hierarchy.pop()) {
-      let currentQueue = this._getHandlerQueue(hierarchy.join('.'))
+      const currentQueue = this._getHandlerQueue(hierarchy.join('.'));
       if (currentQueue && currentQueue.length > 0) {
-        queue.push(...currentQueue)
+        queue.push(...currentQueue);
       }
     }
 
     if (queue && queue.length > 0) {
-      let cqevent = isResponsable ? new CQEvent() : undefined
+      const cqevent = isResponsable ? new CQEvent() : undefined;
       if (isResponsable && Array.isArray(args)) {
-        args.unshift(cqevent)
+        args.unshift(cqevent);
       }
 
-      for (let handler of queue) {
+      for (const handler of queue) {
         if (isResponsable) {
           // reset
-          cqevent._errorHandler = cqevent._responseHandler = cqevent._responseOptions = null
+          cqevent._errorHandler = cqevent._responseHandler = cqevent._responseOptions = null;
         }
 
-        let returned = await Promise.resolve(handler(...args))
+        const returned = await Promise.resolve(handler(...args));
 
         if (isResponsable && (typeof returned === 'string' || Array.isArray(returned))) {
-          cqevent.stopPropagation()
-          cqevent.setMessage(returned)
+          cqevent.stopPropagation();
+          cqevent.setMessage(returned);
         }
 
         if (isResponsable && cqevent._isCanceled) {
-          break
+          break;
         }
       }
 
       if (isResponsable && cqevent.hasMessage()) {
-        let message = cqevent.getMessage()
-        message = !Array.isArray(message) ? message
+        let message = cqevent.getMessage();
+        message = !Array.isArray(message)
+          ? message
           : message
-            .filter(cqmsg => typeof cqmsg === 'object')
-            .map(cqmsg => cqmsg instanceof CQTag ? cqmsg.toJSON() : cqmsg)
+              .filter(cqmsg => typeof cqmsg === 'object')
+              .map(cqmsg => (cqmsg instanceof CQTag ? cqmsg.toJSON() : cqmsg));
 
         this._bot('send_msg', { ...args[1], message }, cqevent._responseOptions)
           .then(ctxt => {
             if (typeof cqevent._responseHandler === 'function') {
-              cqevent._responseHandler(ctxt)
+              cqevent._responseHandler(ctxt);
             }
           })
           .catch(err => {
             if (typeof cqevent._errorHandler === 'function') {
-              cqevent._errorHandler(err)
+              cqevent._errorHandler(err);
             } else {
-              this.emit('error', err)
+              this.emit('error', err);
             }
-          })
+          });
       }
     }
   }
 
-  once (eventType, handler) {
+  once(eventType, handler) {
     const onceWrapper = (...args) => {
-      let returned = handler(...args)
+      const returned = handler(...args);
       // if the returned value is `false` which indicates the handler have not yet finish its task,
       // keep the handler for next event handling
-      if (returned === false) return
+      if (returned === false) return;
 
-      this.off(eventType, onceWrapper)
-      return returned
-    }
-    this._onceListeners.set(handler, onceWrapper)
-    return this.on(eventType, onceWrapper)
+      this.off(eventType, onceWrapper);
+      return returned;
+    };
+    this._onceListeners.set(handler, onceWrapper);
+    return this.on(eventType, onceWrapper);
   }
 
-  off (eventType, handler) {
+  off(eventType, handler) {
     if (typeof eventType !== 'string') {
-      this._onceListeners = new WeakMap()
-      $traverse(this._EventMap, (value) => {
+      this._onceListeners = new WeakMap();
+      $traverse(this._EventMap, value => {
         // clean all handler queues
         if (Array.isArray(value)) {
-          value.splice(0, value.length)
-          return false
+          value.splice(0, value.length);
+          return false;
         }
-      })
-      this._installDefaultErrorHandler()
-      return this
+      });
+      this._installDefaultErrorHandler();
+      return this;
     }
 
-    const queue = this._getHandlerQueue(eventType)
+    const queue = this._getHandlerQueue(eventType);
     if (queue === undefined) {
-      return this
+      return this;
     }
 
     if (typeof handler !== 'function') {
       // clean all handlers of the event queue specified by eventType
-      queue.splice(0, queue.length)
+      queue.splice(0, queue.length);
       if (eventType === 'socket.error') {
-        this._installDefaultErrorHandler()
+        this._installDefaultErrorHandler();
       }
-      return this
+      return this;
     }
 
-    const idx = queue.indexOf(handler)
-    const wrapperIdx = this._onceListeners.has(handler)
-      ? queue.indexOf(this._onceListeners.get(handler)) : -1
+    const idx = queue.indexOf(handler);
+    const wrapperIdx = this._onceListeners.has(handler) ? queue.indexOf(this._onceListeners.get(handler)) : -1;
 
     // no matter the listener is a once listener wrapper or not,
     // the first occurence of the "handler" (2nd arg passed in) or its wrapper will be removed from the queue
-    const victimIdx = idx >= 0 && wrapperIdx >= 0
-      ? Math.min(idx, wrapperIdx)
-      : idx >= 0
-        ? idx
-        : wrapperIdx >= 0
-          ? wrapperIdx
-          : -1
+    const victimIdx =
+      idx >= 0 && wrapperIdx >= 0 ? Math.min(idx, wrapperIdx) : idx >= 0 ? idx : wrapperIdx >= 0 ? wrapperIdx : -1;
 
     if (victimIdx >= 0) {
-      queue.splice(victimIdx, 1)
+      queue.splice(victimIdx, 1);
       if (victimIdx === wrapperIdx) {
-        this._onceListeners.delete(handler)
+        this._onceListeners.delete(handler);
       }
       if (eventType === 'socket.error' && queue.length === 0) {
-        this._installDefaultErrorHandler()
+        this._installDefaultErrorHandler();
       }
-      return this
+      return this;
     }
 
-    return this
+    return this;
   }
 
-  _installDefaultErrorHandler () {
+  _installDefaultErrorHandler() {
     if (this._EventMap.socket.error.length === 0) {
-      this._EventMap.socket.error.push(onSocketError)
-      this._isSocketErrorHandled = false
+      this._EventMap.socket.error.push(onSocketError);
+      this._isSocketErrorHandled = false;
     }
   }
 
-  _removeDefaultErrorHandler () {
+  _removeDefaultErrorHandler() {
     if (!this._isSocketErrorHandled) {
-      this._EventMap.socket.error.splice(0, this._EventMap.socket.error.length)
-      this._isSocketErrorHandled = true
+      this._EventMap.socket.error.splice(0, this._EventMap.socket.error.length);
+      this._isSocketErrorHandled = true;
     }
   }
 
@@ -278,103 +273,103 @@ class CQEventBus {
    * @param {string} eventType
    * @param {function} handler
    */
-  on (eventType, handler) {
+  on(eventType, handler) {
     // @deprecated
     // keep the compatibility for versions lower than v1.5.0
     if (eventType.endsWith('@me')) {
-      eventType = eventType.replace(/\.@me$/, '.@.me')
+      eventType = eventType.replace(/\.@me$/, '.@.me');
     }
 
     if (!this.has(eventType)) {
-      return this
+      return this;
     }
 
     if (eventType === 'socket.error') {
-      this._removeDefaultErrorHandler()
+      this._removeDefaultErrorHandler();
     }
 
-    let queue = this._getHandlerQueue(eventType)
+    const queue = this._getHandlerQueue(eventType);
     if (queue) {
-      queue.push(handler)
+      queue.push(handler);
     }
-    return this
+    return this;
   }
 }
 
-function onSocketError (which, err) {
-  err.which = which
-  console.error('\nYou should listen on "socket.error" yourself to avoid those unhandled promise warnings.\n')
-  throw err
+function onSocketError(which, err) {
+  err.which = which;
+  console.error('\nYou should listen on "socket.error" yourself to avoid those unhandled promise warnings.\n');
+  throw err;
 }
 
 class CQEvent {
-  constructor () {
-    this._isCanceled = false
+  constructor() {
+    this._isCanceled = false;
     /**
      * @type {CQTag[] | string}
      */
-    this._message = ''
-    this._responseHandler = null
-    this._responseOptions = null
-    this._errorHandler = null
+    this._message = '';
+    this._responseHandler = null;
+    this._responseOptions = null;
+    this._errorHandler = null;
   }
 
-  get messageFormat () {
-    return typeof this._message === 'string' ? 'string' : 'array'
+  get messageFormat() {
+    return typeof this._message === 'string' ? 'string' : 'array';
   }
 
-  stopPropagation () {
-    this._isCanceled = true
+  stopPropagation() {
+    this._isCanceled = true;
   }
 
-  getMessage () {
-    return this._message
+  getMessage() {
+    return this._message;
   }
 
-  hasMessage () {
-    return typeof this._message === 'string'
-      ? Boolean(this._message) : this._message.length > 0
+  hasMessage() {
+    return typeof this._message === 'string' ? Boolean(this._message) : this._message.length > 0;
   }
 
-  setMessage (msgIn) {
+  setMessage(msgIn) {
     if (Array.isArray(msgIn)) {
-      msgIn = msgIn.map(m => typeof m === 'string' ? new CQText(m) : m)
+      msgIn = msgIn.map(m => (typeof m === 'string' ? new CQText(m) : m));
     }
-    this._message = msgIn
+    this._message = msgIn;
   }
 
-  appendMessage (msgIn) {
+  appendMessage(msgIn) {
     if (typeof this._message === 'string') {
-      this._message += String(msgIn)
+      this._message += String(msgIn);
     } else {
       if (typeof msgIn === 'string') {
-        msgIn = new CQText(msgIn)
+        msgIn = new CQText(msgIn);
       }
-      this._message.push(msgIn)
+      this._message.push(msgIn);
     }
   }
 
   /**
    * @param {(res: object)=>void} handler
    */
-  onResponse (handler, options) {
+  onResponse(handler, options) {
     if (typeof handler !== 'function') {
-      options = handler
-      handler = null
+      options = handler;
+      handler = null;
     }
 
-    this._responseHandler = handler
-    this._responseOptions = options
+    this._responseHandler = handler;
+    this._responseOptions = options;
   }
 
   /**
    * @param {(error: Error)=>void} handler
    */
-  onError (handler) {
-    this._errorHandler = handler
+  onError(handler) {
+    this._errorHandler = handler;
   }
 }
 
 module.exports = {
-  CQEventBus, CQEvent
-}
+  CQEventBus,
+  CQEvent,
+};

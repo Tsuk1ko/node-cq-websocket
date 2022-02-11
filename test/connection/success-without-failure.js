@@ -1,9 +1,9 @@
-const setup = require('../fixture/setup')
+const setup = require('../fixture/setup');
 
-const { bot, planCount, assertSpies, done } = setup()
+const { bot, planCount, assertSpies, done } = setup();
 
 module.exports = function (t) {
-  t.plan(planCount())
+  t.plan(planCount());
 
   bot
     // .on('socket.connecting', () => {
@@ -11,9 +11,9 @@ module.exports = function (t) {
     // })
     .on('ready', function () {
       // Assertion
-      assertSpies(t, { connectCount: 2, connectingCount: 2 })
-      t.end()
-      done()
+      assertSpies(t, { connectCount: 2, connectingCount: 2 });
+      t.end();
+      done();
     })
-    .connect()
-}
+    .connect();
+};

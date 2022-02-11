@@ -19,6 +19,7 @@ CQWebSocket SDK 是基於 CQHTTP API 插件之 WebSocket 通訊，底層封裝�
 CQWebSocket SDK 使開發者能夠更專心於機器人應用的開發，SDK 為開發者提供底層連線的維護、斷線重連等功能，並第一手先處理了上報事件，依照不同事件類型，將事件文本分發至各事件監聽器處理。
 
 ## 自動獲取機器人QQ號
+
 若機器人配置 `enableAPI` 為 true, 且沒有通過 `qq` 項配置機器人ID的話, 連線建立成功後會主動發送 API 請求向 CQHTTP API 取得酷Q正登錄的QQ號作為機器人QQ號。
 
 此操作為異步操作, 在API響應之前, `@.me` 事件均不會發布。
@@ -26,8 +27,9 @@ CQWebSocket SDK 使開發者能夠更專心於機器人應用的開發，SDK 為
 **除非**真的有人QQ號是 `-1`, 哪尼口雷 Σ(*ﾟдﾟﾉ)ﾉ
 
 ## 事件傳播
-事件具有向上傳播的機制，一個事件上報之後，該事件之所有**親事件**也會依序上報。
-事件名稱以 `.` 相互連接，形成具有繼承關係的結構，如 `message` (任意消息事件) 為 `message.group` (群消息) 的親事件。
+
+事件具有向上傳播的機制，一個事件上報之後，該事件之所有**親事件**也會依序上報。  
+事件名稱以 `.` 相互連接，形成具有繼承關係的結構，如 `message` (任意消息事件) 為 `message.group` (群消息) 的親事件。  
 關於事件親子關係的構成，可參考[事件樹](../api/events.md#%E4%BA%8B%E4%BB%B6%E6%A8%B9)。
 
 舉個例子，群消息有人@某機器人，該機器人則會首先上報 `message.group.@.me` 事件，該事件之親事件由下而上依序為 `message.group.@`, `message.group` 、 `message` ，則這幾個事件也會依照這個順序上報，這樣稱為一次**事件傳播**。
@@ -36,18 +38,19 @@ CQWebSocket SDK 使開發者能夠更專心於機器人應用的開發，SDK 為
 
 > 僅 `message` 及其子事件支援此機制。
 
-`message` 及其子事件監聽器的第一個參數： `CQEvent` 類別實例，在這個機制中扮演重要的角色。
+`message` 及其子事件監聽器的第一個參數： `CQEvent` 類別實例，在這個機制中扮演重要的角色。  
 透過 `CQEvent` 實例，所有監聽器皆可在自己的運行期間調用 `CQEvent #stopPropagation()` 方法聲明自己的處理權，以截獲事件並阻斷後續監聽器的調用，並立即以該事件返回之文字訊息(或透過調用 `CQEvent #setMessage(msg)` 設定之文字訊息，也可以透過 `Promise` 對象 resolve 之文字訊息)作為響應，送回至 CQHTTP API 插件端。
 
 由於在一次事件傳播中的所有監聽器都會收到同一個 `CQEvent` 實例，因此對於響應的決定方式，除了 `CQEvent #stopPropagation()` 所提供的事件截獲機制之外，也可以採取協議式的方式，就是透過每個監聽器調用 `CQEvent #getMessage()` `CQEvent #setMessage(msg)` 協議出一個最終的響應訊息。
 
 ### 範例: 協議式響應
+
 假設機器人具有以下代碼。
 
 ```js
 // app.js
 
-const { CQWebSocket } = require('cq-websocket')
+const { CQWebSocket } = require('@tsuk1ko/cq-websocket')
 const bot = CQWebSocket()
 
 const plugins = [
@@ -85,8 +88,9 @@ module.exports = function (e) {
 
 此時若機器人收到了一則私人消息，則會響應 `"Hello CQWebSocket!"`。
 
-我們也可以藉此機制，加入消息過濾的功能。
+我們也可以藉此機制，加入消息過濾的功能。  
 首先在機器人的 `app.js` 加入以下代碼。
+
 ```js
 // app.js
 const pluginGuard = require('./pluginGuard')
@@ -110,15 +114,18 @@ module.exports = function (e) {
 ```
 
 ## 發送結果追蹤
+
 不論是快速響應或是 API 調用均有此機制。
 
-追蹤快速響應之結果，可通過 CQEvent `#onResponse()` 設置結果監聽器, 並透過 CQEvent `#onError()` 處理響應的錯誤。
+追蹤快速響應之結果，可通過 CQEvent `#onResponse()` 設置結果監聽器, 並透過 CQEvent `#onError()` 處理響應的錯誤。  
 若沒有 CQEvent `#onError()` 進行錯誤處理, 發生響應錯誤時會觸發 [`error` 事件](#基本事件)。
 
 追蹤 API 調用之結果，可以利用 [`bot(method[, params[, options]])`](../api/CQWebSocket.md#api-call) 返回的 Promise 對象進行追蹤。
 
 ## 消息格式
+
 ### 上報消息
+
 `message` 事件中，監聽器第三個參數為一個 `CQTag` 的數組，關於該數組內可能出現的元素，可以參考[CQ 碼相關類別](../api/messages.md)。
 
 ※除了已定義的 CQTag 之外，其餘的內容都會當作 CQText 的字符串處理。
@@ -126,7 +133,9 @@ module.exports = function (e) {
 舉例，上報消息中含有一個不在定義中的 CQ 碼 `"[CQ:unknown,key=value]"`，則此 CQ 碼會被 Parser 判定為一個 CQText 實例，等同 `new CQText('[CQ:unknown,key=value]')`。
 
 ### 發送消息
+
 不論是快速響應或是 API 調用發送消息，均可使用以下消息格式。
+
 1. [字符串格式](https://cqhttp.cc/docs/#/Message?id=%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%A0%BC%E5%BC%8F)
 2. [數組格式](https://cqhttp.cc/docs/#/Message?id=%E6%95%B0%E7%BB%84%E6%A0%BC%E5%BC%8F)
 
@@ -138,6 +147,7 @@ module.exports = function (e) {
 (`CQTag` 可參考 [CQ 碼相關類別](../api/messages.md))
 
 舉個快速響應的例子：
+
 ```js
 bot.on('message', () => {
   return [
@@ -152,9 +162,11 @@ bot.on('message', () => {
   ]
 })
 ```
+
 每當機器人收到消息時，便會回應 `"[CQ:at,qq=123]你好~ 🤗"`。
 
 ### 延伸閱讀
+
 - [CQ 碼](https://d.cqp.me/Pro/CQ%E7%A0%81)
 - [CQHTTP API 之消息格式](https://cqhttp.cc/docs/#/Message)
 - [CQHTTP API 之 CQ 碼](https://cqhttp.cc/docs/#/CQCode)

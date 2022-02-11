@@ -22,5 +22,5 @@ module.exports = [
   'request.group.invite',
 
   'meta_event.lifecycle',
-  'meta_event.heartbeat'
-]
+  'meta_event.heartbeat',
+];

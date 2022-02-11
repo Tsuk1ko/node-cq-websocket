@@ -1,15 +1,15 @@
-const { stub } = require('sinon')
-const setup = require('../fixture/setup')
+const { stub } = require('sinon');
+const setup = require('../fixture/setup');
 
-const { bot, planCount, assertSpies, done } = setup()
+const { bot, planCount, assertSpies, done } = setup();
 
-const manualReconnect = stub()
+const manualReconnect = stub();
 manualReconnect.callsFake(function () {
-  bot.reconnect()
-})
+  bot.reconnect();
+});
 
 module.exports = function (t) {
-  t.plan(planCount())
+  t.plan(planCount());
 
   bot
     .on('ready', function () {
@@ -21,13 +21,13 @@ module.exports = function (t) {
           closingCount: 2,
           closeCount: 2,
           reconnectingCount: 2,
-          reconnectCount: 2
-        })
-        t.end()
-        done()
+          reconnectCount: 2,
+        });
+        t.end();
+        done();
       } else {
-        manualReconnect()
+        manualReconnect();
       }
     })
-    .connect()
-}
+    .connect();
+};
