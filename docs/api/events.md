@@ -17,7 +17,10 @@
 │    ├─ discuss
 │    │    └─ @
 │    │      └─ me
-│    └─ group
+│    ├─ group
+│    │    └─ @
+│    │      └─ me
+│    └─ guild
 │         └─ @
 │           └─ me
 ├─ notice
@@ -32,7 +35,22 @@
 │    ├─ group_increase
 │    │    ├─ approve
 │    │    └─ invite
-│    └─ friend_add
+│    ├─ group_ban
+│    │    ├─ ban
+│    │    └─ lift_ban
+│    ├─ friend_add
+│    ├─ group_recall
+│    ├─ friend_recall
+│    ├─ notify
+│    │    ├─ poke
+│    │    ├─ lucky_king
+│    │    └─ honor
+│    ├─ group_card
+│    ├─ offline_file
+│    ├─ client_status
+│    └─ essence
+│         ├─ add
+│         └─ delete
 ├─ request 
 │    ├─ friend
 │    └─ group

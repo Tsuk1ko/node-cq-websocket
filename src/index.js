@@ -264,9 +264,6 @@ class CQWebSocket extends $Callable {
                 this._eventBus.emit('notice.group_increase', msgObj);
             }
             break;
-          case 'friend_add':
-            this._eventBus.emit('notice.friend_add', msgObj);
-            break;
           case 'group_ban':
             switch (msgObj.sub_type) {
               case 'ban':
@@ -277,6 +274,51 @@ class CQWebSocket extends $Callable {
                 break;
               default:
                 this._eventBus.emit('notice.group_ban', msgObj);
+            }
+            break;
+          case 'friend_add':
+            this._eventBus.emit('notice.friend_add', msgObj);
+            break;
+          case 'group_recall':
+            this._eventBus.emit('notice.group_recall', msgObj);
+            break;
+          case 'friend_recall':
+            this._eventBus.emit('notice.friend_recall', msgObj);
+            break;
+          case 'notify':
+            switch (msgObj.sub_type) {
+              case 'poke':
+                this._eventBus.emit('notice.notify.poke', msgObj);
+                break;
+              case 'lucky_king':
+                this._eventBus.emit('notice.notify.lucky_king', msgObj);
+                break;
+              case 'honor':
+                this._eventBus.emit('notice.notify.honor', msgObj);
+                break;
+              default:
+                this._eventBus.emit('notice.notify', msgObj);
+            }
+            break;
+          case 'group_card':
+            this._eventBus.emit('notice.group_card', msgObj);
+            break;
+          case 'offline_file':
+            this._eventBus.emit('notice.offline_file', msgObj);
+            break;
+          case 'client_status':
+            this._eventBus.emit('notice.client_status', msgObj);
+            break;
+          case 'essence':
+            switch (msgObj.sub_type) {
+              case 'add':
+                this._eventBus.emit('notice.essence.add', msgObj);
+                break;
+              case 'delete':
+                this._eventBus.emit('notice.essence.delete', msgObj);
+                break;
+              default:
+                this._eventBus.emit('notice.notify', msgObj);
             }
             break;
           default:
