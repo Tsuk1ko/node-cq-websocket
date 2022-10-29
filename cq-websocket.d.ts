@@ -40,22 +40,39 @@ export type MessageEvents =
   | 'message.discuss.@.me'
   | 'message.group'
   | 'message.group.@'
-  | 'message.group.@.me';
+  | 'message.group.@.me'
+  | 'message.guild'
+  | 'message.guild.@'
+  | 'message.guild.@.me';
 
 export type NoticeEvents =
   | 'notice.group_upload'
+  | 'notice.group_admin'
   | 'notice.group_admin.set'
   | 'notice.group_admin.unset'
+  | 'notice.group_decrease'
   | 'notice.group_decrease.leave'
   | 'notice.group_decrease.kick'
   | 'notice.group_decrease.kick_me'
+  | 'notice.group_increase'
   | 'notice.group_increase.approve'
   | 'notice.group_increase.invite'
+  | 'notice.group_ban'
+  | 'notice.group_ban.ban'
+  | 'notice.group_ban.lift_ban'
   | 'notice.friend_add'
-  // node
-  | 'notice.group_admin'
-  | 'notice.group_decrease'
-  | 'notice.group_increase';
+  | 'notice.group_recall'
+  | 'notice.friend_recall'
+  | 'notice.notify'
+  | 'notice.notify.poke'
+  | 'notice.notify.lucky_king'
+  | 'notice.notify.honor'
+  | 'notice.group_card'
+  | 'notice.offline_file'
+  | 'notice.client_status'
+  | 'notice.essence'
+  | 'notice.essence.add'
+  | 'notice.essence.delete';
 
 export type RequestEvents =
   | 'request.friend'
