@@ -318,7 +318,7 @@ class CQWebSocket extends $Callable {
                 this._eventBus.emit('notice.essence.delete', msgObj);
                 break;
               default:
-                this._eventBus.emit('notice.notify', msgObj);
+                this._eventBus.emit('notice.essence', msgObj);
             }
             break;
           default:
