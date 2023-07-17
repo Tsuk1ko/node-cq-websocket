@@ -39,7 +39,7 @@ new CQWebSocket(opt)
 | `fragmentationThreshold` | number | 0x4000 | 每個 frame 的最大容量, 默認為 16 KiB, 單位: byte<br>※詳情請見 [WebSocketClient 選項說明](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/WebSocketClient.md#client-config-options)。 |
 | `tlsOptions` | object | {} | 若需調用安全連線 [https.request](https://nodejs.org/api/https.html#https_https_request_options_callback) 時的選項 |
 | `requestOptions` | { <br>`timeout`: number <br>} | {} | 調用 API 方法時的全局默認選項。 |
-| `convertPostFormat` | undefined \| "string" | `undefined` | 转换上报格式，目前仅支持 `"string"`，即可以将收到的 array 消息转换成 string 消息再交给事件 |
+| `forceMsgFormat` | undefined \| "string" | `undefined` | 强制上报格式，目前仅支持 `"string"`，即 `ctx.message` 上报强制为 string 消息 |
 
 ## connect()
 ```js

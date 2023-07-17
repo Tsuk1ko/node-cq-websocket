@@ -31,7 +31,7 @@ export interface CQWebSocketOption {
   fragmentationThreshold: number;
   tlsOptions: any;
   requestOptions: CQRequestOptions;
-  convertPostFormat: 'string';
+  forcePostFormat: 'string';
 }
 
 export type BaseEvents = 'message' | 'notice' | 'request' | 'error' | 'ready';

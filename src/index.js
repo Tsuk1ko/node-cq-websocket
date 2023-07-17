@@ -56,7 +56,7 @@ class CQWebSocket extends $Callable {
     fragmentationThreshold,
     tlsOptions,
 
-    convertPostFormat,
+    forcePostFormat,
   } = {}) {
     super('__call__');
 
@@ -97,7 +97,7 @@ class CQWebSocket extends $Callable {
         this._wsOptions[k] = v;
       });
 
-    this._convertPostFormat = convertPostFormat;
+    this._forcePostFormat = forcePostFormat;
 
     /// *****************/
     //     states
@@ -207,8 +207,12 @@ class CQWebSocket extends $Callable {
         // parsing coolq tags
         const tags = parseCQTags(msgObj.message);
 
-        if (this._convertPostFormat === 'string' && Array.isArray(msgObj.message)) {
-          msgObj.message = convertArrayMsgToStringMsg(msgObj.message);
+        if (this._forcePostFormat === 'string' && Array.isArray(msgObj.message)) {
+          if (typeof msgObj.raw_message === 'string') {
+            msgObj.message = msgObj.raw_message;
+          } else {
+            msgObj.message = convertArrayMsgToStringMsg(msgObj.message);
+          }
         }
 
         switch (msgObj.message_type) {
