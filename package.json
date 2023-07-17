@@ -1,6 +1,6 @@
 {
   "name": "@tsuk1ko/cq-websocket",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "A Node SDK for developing QQ chatbots based on WebSocket, which is depending on CoolQ and CQHTTP API plugin.",
   "main": "./src/index.js",
   "browser": "./dist/cq-websocket.min.js",
