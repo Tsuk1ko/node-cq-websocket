@@ -12,7 +12,7 @@
   - [once](#once)
   - [off](#off)
   - [API call](#api-call)
-    - [範例](#%E7%AF%84%E4%BE%8B)
+    - [範例](#範例)
 
 ## constructor
 ```js
@@ -25,20 +25,21 @@ new CQWebSocket(opt)
 | 屬性 | 類型 | 默認值 |  說明
 | - | - | - | - |
 | `accessToken` | string | `""` | API 訪問 token 。見 CQHTTP API 之[配置文件說明](https://cqhttp.cc/docs/#/Configuration) |
-|  `enableAPI` | boolean | `true` | 啟用 /api 連線 |
-|  `enableEvent` | boolean | `true` | 啟用 /event 連線 |
-|  `protocol` | string | `"ws:"` | 協議名 |
-|  `host` | string | `"127.0.0.1"` | 酷Q伺服器 IP |
-|  `port` | number | 6700 | 酷Q伺服器端口 |
-|  `baseUrl` | string | 6700 | 酷Q伺服器位址 (SDK在建立連線時會依照此設定加上前綴項 `ws://` 及後綴項 `/<api|event>[?accessToken={token}]`) |
-|  `qq` | number &#124; string | -1 | 觸發 `@me` 事件用的QQ帳號，通常同登入酷Q之帳號，用在討論組消息及群消息中辨認是否有人at此帳號 |
-|  `reconnection` | boolean | true | 是否連線錯誤時自動重連 |
-|  `reconnectionAttempts` | number | Infinity | **連續**連線失敗的次數不超過這個值 |
-|  `reconnectionDelay` | number | 1000 | 重複連線的延遲時間, 單位: ms |
-|  `fragmentOutgoingMessages` | boolean | false | 由於 CQHTTP API 插件的 websocket 服務器尚未支持 fragment, 故建議維持 `false` 禁用 fragment。<br>※詳情請見 [WebSocketClient 選項說明](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/WebSocketClient.md#client-config-options)。 |
-|  `fragmentationThreshold` | number | 0x4000 | 每個 frame 的最大容量, 默認為 16 KiB, 單位: byte<br>※詳情請見 [WebSocketClient 選項說明](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/WebSocketClient.md#client-config-options)。 |
-|  `tlsOptions` | object | {} | 若需調用安全連線 [https.request](https://nodejs.org/api/https.html#https_https_request_options_callback) 時的選項 |
-|  `requestOptions` | { <br>`timeout`: number <br>} | {} | 調用 API 方法時的全局默認選項。 |
+| `enableAPI` | boolean | `true` | 啟用 /api 連線 |
+| `enableEvent` | boolean | `true` | 啟用 /event 連線 |
+| `protocol` | string | `"ws:"` | 協議名 |
+| `host` | string | `"127.0.0.1"` | 酷Q伺服器 IP |
+| `port` | number | 6700 | 酷Q伺服器端口 |
+| `baseUrl` | string | 6700 | 酷Q伺服器位址 (SDK在建立連線時會依照此設定加上前綴項 `ws://` 及後綴項 `/<api|event>[?accessToken={token}]`) |
+| `qq` | number &#124; string | -1 | 觸發 `@me` 事件用的QQ帳號，通常同登入酷Q之帳號，用在討論組消息及群消息中辨認是否有人at此帳號 |
+| `reconnection` | boolean | true | 是否連線錯誤時自動重連 |
+| `reconnectionAttempts` | number | Infinity | **連續**連線失敗的次數不超過這個值 |
+| `reconnectionDelay` | number | 1000 | 重複連線的延遲時間, 單位: ms |
+| `fragmentOutgoingMessages` | boolean | false | 由於 CQHTTP API 插件的 websocket 服務器尚未支持 fragment, 故建議維持 `false` 禁用 fragment。<br>※詳情請見 [WebSocketClient 選項說明](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/WebSocketClient.md#client-config-options)。 |
+| `fragmentationThreshold` | number | 0x4000 | 每個 frame 的最大容量, 默認為 16 KiB, 單位: byte<br>※詳情請見 [WebSocketClient 選項說明](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/WebSocketClient.md#client-config-options)。 |
+| `tlsOptions` | object | {} | 若需調用安全連線 [https.request](https://nodejs.org/api/https.html#https_https_request_options_callback) 時的選項 |
+| `requestOptions` | { <br>`timeout`: number <br>} | {} | 調用 API 方法時的全局默認選項。 |
+| `convertPostFormat` | undefined \| "string" | `undefined` | 转换上报格式，目前仅支持 `"string"`，即可以将收到的 array 消息转换成 string 消息再交给事件 |
 
 ## connect()
 ```js

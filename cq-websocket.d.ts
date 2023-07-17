@@ -22,6 +22,7 @@ export interface CQWebSocketOption {
   host: string;
   port: number;
   baseUrl: string;
+  /** @deprecated */
   qq: number | string;
   reconnection: boolean;
   reconnectionAttempts: number;
@@ -30,6 +31,7 @@ export interface CQWebSocketOption {
   fragmentationThreshold: number;
   tlsOptions: any;
   requestOptions: CQRequestOptions;
+  convertPostFormat: 'string';
 }
 
 export type BaseEvents = 'message' | 'notice' | 'request' | 'error' | 'ready';

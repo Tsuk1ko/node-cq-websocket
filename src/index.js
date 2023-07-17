@@ -4,7 +4,7 @@ const $get = require('lodash.get');
 const $CQEventBus = require('./event-bus.js').CQEventBus;
 const $Callable = require('./util/callable');
 const message = require('./message');
-const { parse: parseCQTags } = message;
+const { parse: parseCQTags, convertArrayMsgToStringMsg } = message;
 const {
   SocketError,
   InvalidWsTypeError,
@@ -55,6 +55,8 @@ class CQWebSocket extends $Callable {
     fragmentOutgoingMessages = false,
     fragmentationThreshold,
     tlsOptions,
+
+    convertPostFormat,
   } = {}) {
     super('__call__');
 
@@ -94,6 +96,8 @@ class CQWebSocket extends $Callable {
       .forEach(([k, v]) => {
         this._wsOptions[k] = v;
       });
+
+    this._convertPostFormat = convertPostFormat;
 
     /// *****************/
     //     states
@@ -202,6 +206,10 @@ class CQWebSocket extends $Callable {
       case 'message':
         // parsing coolq tags
         const tags = parseCQTags(msgObj.message);
+
+        if (this._convertPostFormat === 'string' && Array.isArray(msgObj.message)) {
+          msgObj.message = convertArrayMsgToStringMsg(msgObj.message);
+        }
 
         switch (msgObj.message_type) {
           case 'private':
