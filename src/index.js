@@ -1,4 +1,4 @@
-const $WebSocket = require('websocket').w3cwebsocket;
+const { WebSocket } = require('ws');
 const shortid = require('shortid');
 const $get = require('lodash.get');
 const $CQEventBus = require('./event-bus.js').CQEventBus;
@@ -52,9 +52,9 @@ class CQWebSocket extends $Callable {
     requestOptions = {},
 
     // underlying websocket configs, only meaningful in Nodejs environment
-    fragmentOutgoingMessages = false,
-    fragmentationThreshold,
-    tlsOptions,
+    // fragmentOutgoingMessages = false,
+    // fragmentationThreshold,
+    // tlsOptions,
 
     forcePostFormat,
   } = {}) {
@@ -85,17 +85,17 @@ class CQWebSocket extends $Callable {
 
     this._requestOptions = requestOptions;
 
-    this._wsOptions = {};
+    // this._wsOptions = {};
 
-    Object.entries({
-      fragmentOutgoingMessages,
-      fragmentationThreshold,
-      tlsOptions,
-    })
-      .filter(([k, v]) => v !== undefined)
-      .forEach(([k, v]) => {
-        this._wsOptions[k] = v;
-      });
+    // Object.entries({
+    //   fragmentOutgoingMessages,
+    //   fragmentationThreshold,
+    //   tlsOptions,
+    // })
+    //   .filter(([k, v]) => v !== undefined)
+    //   .forEach(([k, v]) => {
+    //     this._wsOptions[k] = v;
+    //   });
 
     this._forcePostFormat = forcePostFormat;
 
@@ -393,7 +393,7 @@ class CQWebSocket extends $Callable {
   }
 
   /**
-   * @param {(wsType: "/api"|"/event", label: "EVENT"|"API", client: $WebSocket) => void} cb
+   * @param {(wsType: "/api"|"/event", label: "EVENT"|"API") => void} cb
    * @param {"/api"|"/event"} [types]
    */
   _forEachSock(cb, types = [WebSocketType.EVENT, WebSocketType.API]) {
@@ -421,7 +421,7 @@ class CQWebSocket extends $Callable {
       if ([WebSocketState.INIT, WebSocketState.CLOSED].includes(this._monitor[_label].state)) {
         const tokenQS = this._token ? `?access_token=${this._token}` : '';
 
-        let _sock = new $WebSocket(`${this._baseUrl}/${_label.toLowerCase()}${tokenQS}`, undefined, this._wsOptions);
+        let _sock = new WebSocket(`${this._baseUrl}/${_label.toLowerCase()}${tokenQS}`);
 
         if (_type === WebSocketType.EVENT) {
           this._eventSock = _sock;

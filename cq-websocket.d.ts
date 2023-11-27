@@ -27,9 +27,9 @@ export interface CQWebSocketOption {
   reconnection: boolean;
   reconnectionAttempts: number;
   reconnectionDelay: number;
-  fragmentOutgoingMessages: boolean;
-  fragmentationThreshold: number;
-  tlsOptions: any;
+  // fragmentOutgoingMessages: boolean;
+  // fragmentationThreshold: number;
+  // tlsOptions: any;
   requestOptions: CQRequestOptions;
   forcePostFormat: 'string';
 }
