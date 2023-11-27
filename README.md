@@ -13,12 +13,6 @@
 ## 🛠️ 開發者看板
 本 SDK 採用 [ava](https://github.com/avajs/ava) 框架執行測試。
 
-### 打包 CQWebSocket 至 browser 環境
-```bash
-npm run build
-```
-使用 webpack 將 SDK 及所有依賴打包, 並在 `/dist`目錄下產生一個 `cq-websocket.min.js`。
-
 ### 建置 demo/webpack
 ```bash
 npm run build-demo
